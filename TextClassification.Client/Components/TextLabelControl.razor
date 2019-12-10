@@ -1,17 +1,19 @@
+@inject HttpClient Http
+
 <div class="panel">
     <div class="header">
         <select @onchange=OnFilterSelected>
             <option value="@FiltersEnum.ShowAll">Show All</option>
             <option value="@FiltersEnum.WithLabels">With labels</option>
             <option value="@FiltersEnum.WithoutLabels">Without Labels</option>
-        </select>        
-        <button class="next">
+        </select>
+        <button class="next" @onclick=ShowNextTextSample>
             Next
         </button>
     </div>
     <div class="content">
         <p class="text-sample">
-            @Text
+            @CurrentTextSample.Value
         </p>
 
         <div class="text-label-container">
@@ -27,16 +29,55 @@
 </div>
 
 @code {
-    [Parameter]
-    public string Text { get; set; }
 
-    [Parameter]
-    public EventCallback<FiltersEnum> FilterSelected { get; set; }
+    private IReadOnlyList<TextSample> TextSamples { get; set; }
 
-    async Task OnFilterSelected(ChangeEventArgs args)
+    private int SkipTextSamples { get; set; }
+
+    private FiltersEnum TextSampleFilter { get; set; }
+
+    private TextSample CurrentTextSample
     {
-        var filter = (FiltersEnum) Enum.Parse(typeof(FiltersEnum), args.Value.ToString(), true);        
+        get
+        {
+            var defaultValue = new TextSample();
 
-        await FilterSelected.InvokeAsync(filter);
+            switch (TextSampleFilter)
+            {
+                case FiltersEnum.ShowAll:
+                    return TextSamples.Skip(SkipTextSamples).FirstOrDefault() ?? defaultValue;
+
+                case FiltersEnum.WithLabels:
+                    return TextSamples.Skip(SkipTextSamples).FirstOrDefault(ts => ts.Labels.Any()) ?? defaultValue;
+
+                case FiltersEnum.WithoutLabels:
+                    return TextSamples.Skip(SkipTextSamples).FirstOrDefault(ts => !ts.Labels.Any()) ?? defaultValue;
+            }
+
+            return defaultValue;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        TextSamples = await Http.GetJsonAsync<TextSample[]>("sample-data/text-samples.json");
+
+        TextSampleFilter = FiltersEnum.ShowAll;
+    }
+
+    private void ShowNextTextSample()
+    {
+        SkipTextSamples++;
+
+        if (SkipTextSamples == TextSamples.Count)
+        {
+            SkipTextSamples = 0;
+        }
+    }
+
+    private void OnFilterSelected(ChangeEventArgs args)
+    {
+        TextSampleFilter = (FiltersEnum)Enum.Parse(typeof(FiltersEnum), args.Value.ToString(), ignoreCase: true);
+        SkipTextSamples = 0;
     }
 }
