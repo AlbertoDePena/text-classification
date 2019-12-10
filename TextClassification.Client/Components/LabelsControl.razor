@@ -1,0 +1,36 @@
+@inject HttpClient Http
+
+<div class="panel">
+    <div class="header">
+        Labels
+    </div>
+    <div class="content">
+        <input class="filter-label-input" placeholder="Filter labels..."/>
+        <div class="labels">
+            @if (Labels != null)
+            {
+                @foreach (var label in Labels)
+                {
+                    <div class="label" @onclick="@(() => OnLabelSelected(label))">@label.Name</div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    public IReadOnlyList<Label> Labels { get; private set; }
+    
+    [Parameter]
+    public EventCallback<Label> LabelSelected { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Labels = await Http.GetJsonAsync<Label[]>("sample-data/labels.json");
+    }
+
+    private async Task OnLabelSelected(Label label)
+    {
+        await LabelSelected.InvokeAsync(label);
+    }
+}

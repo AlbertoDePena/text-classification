@@ -1,0 +1,20 @@
+<nav class="navbar">
+    <div class="navbar-title">Text Classification</div>
+    <div class="navbar-links">
+        <div class="navbar-link" @onclick="DisplayTextSamplesDialog">Text Samples</div>
+        <div class="navbar-link" @onclick="DisplayLabelsDialog">Labels</div>
+    </div>
+</nav>
+
+@code {
+
+    void DisplayTextSamplesDialog() 
+    {
+        Console.WriteLine("DisplayTextSamplesDialog clicked");
+    }
+
+    void DisplayLabelsDialog() 
+    {
+        Console.WriteLine("DisplayLabelsDialog clicked");
+    }
+}

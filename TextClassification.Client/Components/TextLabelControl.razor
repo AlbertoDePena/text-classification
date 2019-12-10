@@ -1,0 +1,42 @@
+<div class="panel">
+    <div class="header">
+        <select @onchange=OnFilterSelected>
+            <option value="@FiltersEnum.ShowAll">Show All</option>
+            <option value="@FiltersEnum.WithLabels">With labels</option>
+            <option value="@FiltersEnum.WithoutLabels">Without Labels</option>
+        </select>        
+        <button class="next">
+            Next
+        </button>
+    </div>
+    <div class="content">
+        <p class="text-sample">
+            @Text
+        </p>
+
+        <div class="text-label-container">
+            @for (int i = 1; i < 21; i++)
+            {
+                <div class="text-label">
+                    <div class="text">Label @i</div>
+                    <button>X</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public EventCallback<FiltersEnum> FilterSelected { get; set; }
+
+    async Task OnFilterSelected(ChangeEventArgs args)
+    {
+        var filter = (FiltersEnum) Enum.Parse(typeof(FiltersEnum), args.Value.ToString(), true);        
+
+        await FilterSelected.InvokeAsync(filter);
+    }
+}

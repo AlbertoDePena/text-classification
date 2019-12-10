@@ -1,0 +1,28 @@
+﻿<div class="navbar-container">
+    <Navbar />
+</div>
+
+<div class="main-container">
+    <main>
+        <div>
+            <TextLabelControl FilterSelected=@OnFilterSelected Text="This is a test" />
+        </div>
+
+        <div>
+            <LabelsControl LabelSelected=@OnLabelSelected />
+        </div>
+    </main>
+</div>
+
+@code {
+
+    void OnFilterSelected(FiltersEnum filter)
+    {
+        Console.WriteLine(filter);
+    }
+
+    void OnLabelSelected(Label label)
+    {
+        Console.WriteLine(label.Name);
+    }
+}
