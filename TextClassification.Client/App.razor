@@ -1,28 +1,131 @@
-﻿<div class="navbar-container">
+﻿@inject HttpClient Http
+
+<div class="navbar-container">
     <Navbar />
 </div>
 
 <div class="main-container">
     <main>
         <div>
-            <TextLabelControl />
+            <div class="panel">
+                <div class="header">
+                    <select @onchange=OnFilterSelected>
+                        <option value="@FiltersEnum.ShowAll">Show All</option>
+                        <option value="@FiltersEnum.WithLabels">With labels</option>
+                        <option value="@FiltersEnum.WithoutLabels">Without Labels</option>
+                    </select>
+                    <button class="next" @onclick=ShowNextTextSample>
+                        Next
+                    </button>
+                </div>
+                <div class="content">
+                    <p class="text-sample">
+                        @CurrentTextSample.Value
+                    </p>
+
+                    <div class="text-label-container">
+                        @foreach (var label in CurrentTextSample.Labels)
+                        {
+                            <div class="text-label" @key=label.Id>
+                                <div class="text">@label.Name</div>
+                                <button @onclick="(() => RemoveLabel(label))">X</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div>
-            <LabelsControl LabelSelected=@OnLabelSelected />
+            <LabelsControl LabelSelected=@AddLabel />
         </div>
     </main>
 </div>
 
 @code {
 
-    void OnFilterSelected(FiltersEnum filter)
+    IReadOnlyList<TextSample> _textSamples;
+
+    int _skipTextSamples;
+
+    FiltersEnum _textSampleFilter;
+
+    TextSample CurrentTextSample
     {
-        Console.WriteLine(filter);
+        get
+        {
+            var defaultValue = new TextSample();
+
+            switch (_textSampleFilter)
+            {
+                case FiltersEnum.ShowAll:
+                    return _textSamples.Skip(_skipTextSamples).FirstOrDefault() ?? defaultValue;
+
+                case FiltersEnum.WithLabels:
+                    return _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => ts.Labels.Any()) ?? defaultValue;
+
+                case FiltersEnum.WithoutLabels:
+                    return _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => !ts.Labels.Any()) ?? defaultValue;
+            }
+
+            return defaultValue;
+        }
     }
 
-    void OnLabelSelected(Label label)
+    protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine(label.Name);
+        _textSamples = await Http.GetJsonAsync<TextSample[]>("sample-data/text-samples.json");
+
+        _textSampleFilter = FiltersEnum.ShowAll;
+    }
+
+    void ShowNextTextSample()
+    {
+        _skipTextSamples++;
+
+        if (_skipTextSamples == _textSamples.Count)
+        {
+            _skipTextSamples = 0;
+        }
+    }
+
+    void OnFilterSelected(ChangeEventArgs args)
+    {
+        _textSampleFilter = (FiltersEnum)Enum.Parse(typeof(FiltersEnum), args.Value.ToString(), ignoreCase: true);
+        _skipTextSamples = 0;
+    }
+
+    void AddLabel(Label label)
+    {
+        var textSample = _textSamples.FirstOrDefault(ts => ts.Id == CurrentTextSample.Id);
+
+        if (textSample == null) return;
+
+        var hasLabel = textSample.Labels.Any(l => l.Id == label.Id);
+
+        if (hasLabel) return;
+
+        var newLabels = textSample.Labels.ToList();
+
+        newLabels.Add(label);
+
+        textSample.Labels = newLabels.ToArray();
+    }
+
+    void RemoveLabel(Label label)
+    {
+        var textSample = _textSamples.FirstOrDefault(ts => ts.Id == CurrentTextSample.Id);
+
+        if (textSample == null) return;
+
+        var hasLabel = textSample.Labels.Any(l => l.Id == label.Id);
+
+        if (!hasLabel) return;
+
+        var newLabels = textSample.Labels.ToList();
+
+        newLabels.Remove(label);
+
+        textSample.Labels = newLabels.ToArray();
     }
 }

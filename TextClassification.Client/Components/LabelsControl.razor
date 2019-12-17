@@ -7,9 +7,9 @@
     <div class="content">
         <input class="filter-label-input" placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
         <div class="labels">
-            @if (FilteredLabels != null)
+            @if (_filteredLabels != null)
             {
-                @foreach (var label in FilteredLabels)
+                @foreach (var label in _filteredLabels)
                 {
                     <div class="label" @key=label.Id @onclick="(() => OnLabelSelected(label))">@label.Name</div>
                 }
@@ -19,30 +19,30 @@
 </div>
 
 @code {
-   
+
     [Parameter]
     public EventCallback<Label> LabelSelected { get; set; }
 
-    private IReadOnlyList<Label> Labels { get; set; }
+    IReadOnlyList<Label> _labels;
 
-    private IReadOnlyList<Label> FilteredLabels { get; set; }
+    IReadOnlyList<Label> _filteredLabels;
 
     protected override async Task OnInitializedAsync()
     {
-        Labels = await Http.GetJsonAsync<Label[]>("sample-data/labels.json");
+        _labels = await Http.GetJsonAsync<Label[]>("sample-data/labels.json");
 
         FilterLabels(filter: string.Empty);
     }
 
-    private async Task OnLabelSelected(Label label) => await LabelSelected.InvokeAsync(label);
+    async Task OnLabelSelected(Label label) => await LabelSelected.InvokeAsync(label);
 
-    private void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
+    void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
 
-    private void FilterLabels(string filter)
+    void FilterLabels(string filter)
     {
-        FilteredLabels = 
+        _filteredLabels =
             string.IsNullOrWhiteSpace(filter) ?
-            Labels :
-            Labels.Where(l => l.Name.ToUpper().Contains(filter.ToUpper())).ToList();
+            _labels :
+            _labels.Where(l => l.Name.ToUpper().Contains(filter.ToUpper())).ToList();
     }
 }
