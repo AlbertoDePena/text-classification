@@ -1,4 +1,4 @@
-@inject HttpClient Http
+@inherits LabelsControlBase
 
 <div class="panel">
     <div class="header">
@@ -7,9 +7,9 @@
     <div class="content">
         <input class="filter-label-input" placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
         <div class="labels">
-            @if (_filteredLabels != null)
+            @if (FilteredLabels != null)
             {
-                @foreach (var label in _filteredLabels)
+                @foreach (var label in FilteredLabels)
                 {
                     <div class="label" @key=label.Id @onclick="(() => OnLabelSelected(label))">@label.Name</div>
                 }
@@ -17,32 +17,3 @@
         </div>
     </div>
 </div>
-
-@code {
-
-    [Parameter]
-    public EventCallback<Label> LabelSelected { get; set; }
-
-    IReadOnlyList<Label> _labels;
-
-    IReadOnlyList<Label> _filteredLabels;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _labels = await Http.GetJsonAsync<Label[]>("sample-data/labels.json");
-
-        FilterLabels(filter: string.Empty);
-    }
-
-    async Task OnLabelSelected(Label label) => await LabelSelected.InvokeAsync(label);
-
-    void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
-
-    void FilterLabels(string filter)
-    {
-        _filteredLabels =
-            string.IsNullOrWhiteSpace(filter) ?
-            _labels :
-            _labels.Where(l => l.Name.ToUpper().Contains(filter.ToUpper())).ToList();
-    }
-}
