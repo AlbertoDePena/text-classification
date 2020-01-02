@@ -5,12 +5,12 @@ namespace TextClassification.Client.Components
 {
     public class NavbarBase : ComponentBase
     {
-        protected void DisplayTextSamplesDialog()
+        public void DisplayTextSamplesDialog()
         {
             Console.WriteLine("DisplayTextSamplesDialog clicked");
         }
 
-        protected void DisplayLabelsDialog()
+        public void DisplayLabelsDialog()
         {
             Console.WriteLine("DisplayLabelsDialog clicked");
         }

@@ -10,16 +10,16 @@ namespace TextClassification.Client
 {
     public class AppBase : ComponentBase
     {
-        [Inject]
-        public HttpClient Http { get; set; }
-
         private IReadOnlyList<TextSample> _textSamples;
 
         private int _skipTextSamples;
 
         private FiltersEnum _textSampleFilter;
 
-        protected TextSample CurrentTextSample
+        [Inject]
+        public HttpClient Http { get; set; }
+
+        public TextSample CurrentTextSample
         {
             get
             {
@@ -42,7 +42,7 @@ namespace TextClassification.Client
             _textSampleFilter = FiltersEnum.ShowAll;
         }
 
-        protected void ShowNextTextSample()
+        public void ShowNextTextSample()
         {
             _skipTextSamples++;
 
@@ -52,13 +52,13 @@ namespace TextClassification.Client
             }
         }
 
-        protected void OnFilterSelected(ChangeEventArgs args)
+        public void OnFilterSelected(ChangeEventArgs args)
         {
             _textSampleFilter = (FiltersEnum)Enum.Parse(typeof(FiltersEnum), args.Value.ToString(), ignoreCase: true);
             _skipTextSamples = 0;
         }
 
-        protected void AddLabel(Label label)
+        public void AddLabel(Label label)
         {
             var textSample = _textSamples.FirstOrDefault(ts => ts.Id == CurrentTextSample.Id);
 
@@ -75,7 +75,7 @@ namespace TextClassification.Client
             textSample.Labels = newLabels.ToArray();
         }
 
-        protected void RemoveLabel(Label label)
+        public void RemoveLabel(Label label)
         {
             var textSample = _textSamples.FirstOrDefault(ts => ts.Id == CurrentTextSample.Id);
 

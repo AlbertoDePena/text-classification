@@ -8,17 +8,17 @@ using TextClassification.Contracts;
 
 namespace TextClassification.Client.Components
 {
-    public class LabelsControlBase : ComponentBase
+    public class LabelsSelectorBase : ComponentBase
     {
+        private IReadOnlyList<Label> _labels;
+
         [Inject]
         public HttpClient Http { get; set; }
 
         [Parameter]
         public EventCallback<Label> LabelSelected { get; set; }
 
-        private IReadOnlyList<Label> _labels;
-
-        protected IReadOnlyList<Label> FilteredLabels;
+        public IReadOnlyList<Label> FilteredLabels;
 
         protected override async Task OnInitializedAsync()
         {
@@ -27,11 +27,11 @@ namespace TextClassification.Client.Components
             FilterLabels(filter: string.Empty);
         }
 
-        protected async Task OnLabelSelected(Label label) => await LabelSelected.InvokeAsync(label);
+        public Task OnLabelSelectedAsync(Label label) => LabelSelected.InvokeAsync(label);
 
-        protected void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
+        public void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
 
-        protected void FilterLabels(string filter)
+        private void FilterLabels(string filter)
         {
             FilteredLabels =
                 string.IsNullOrWhiteSpace(filter) ?
