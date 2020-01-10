@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: text-classification-deployment
+  labels:
+    poc: text-classification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      poc: text-classification
+  template:
+    metadata:
+      labels:
+        poc: text-classification
+    spec:
+      containers:
+      - name: text-classification
+        image: adepena/text-classification:dev
+        ports:
+        - containerPort: 80

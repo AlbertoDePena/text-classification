@@ -11,6 +11,6 @@ COPY . ./
 
 RUN dotnet publish ./TextClassification.Client/TextClassification.Client.csproj -c Release
 
-FROM nginx
+FROM nginx:alpine
 
 COPY --from=build /src/TextClassification.Client/bin/Release/netstandard2.1/publish/TextClassification.Client/dist/ ./usr/share/nginx/html/
