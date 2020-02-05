@@ -17,5 +17,6 @@ spec:
       containers:
       - name: text-classification
         image: adepena/text-classification:dev
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
