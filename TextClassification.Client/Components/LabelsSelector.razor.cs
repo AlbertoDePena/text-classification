@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace TextClassification.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            _labels = await Http.GetJsonAsync<Label[]>("sample-data/labels.json");
+            _labels = await Http.GetFromJsonAsync<Label[]>("sample-data/labels.json");
 
             FilterLabels(filter: string.Empty);
         }

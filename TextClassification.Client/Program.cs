@@ -1,5 +1,8 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Blazor.Hosting;
+using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System;
 
 namespace TextClassification.Client
 {
@@ -10,6 +13,9 @@ namespace TextClassification.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
             builder.RootComponents.Add<App>("app");
+
+            builder.Services.AddTransient(_ =>
+                new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             await builder.Build().RunAsync();
         }

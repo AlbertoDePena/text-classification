@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using TextClassification.Contracts;
@@ -37,7 +38,7 @@ namespace TextClassification.Client
 
         protected override async Task OnInitializedAsync()
         {
-            _textSamples = await Http.GetJsonAsync<TextSample[]>("sample-data/text-samples.json");
+            _textSamples = await Http.GetFromJsonAsync<TextSample[]>("sample-data/text-samples.json");
 
             _textSampleFilter = FiltersEnum.ShowAll;
         }
