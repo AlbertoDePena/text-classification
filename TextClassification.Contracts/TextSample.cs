@@ -1,3 +1,6 @@
+using System.Linq;
+using System.Collections.Generic;
+
 namespace TextClassification.Contracts
 {
     public class TextSample
@@ -6,6 +9,6 @@ namespace TextClassification.Contracts
 
         public string Value { get; set; }
 
-        public Label[] Labels { get; set; } = new Label[0];
+        public IEnumerable<Label> Labels { get; set; } = Enumerable.Empty<Label>();
     }
 }

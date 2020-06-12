@@ -14,7 +14,7 @@ namespace TextClassification.Client.Components
         private IReadOnlyList<Label> _labels;
 
         [Inject]
-        public HttpClient Http { get; set; }
+        public HttpClient HttpClient { get; set; }
 
         [Parameter]
         public EventCallback<Label> LabelSelected { get; set; }
@@ -23,7 +23,7 @@ namespace TextClassification.Client.Components
 
         protected override async Task OnInitializedAsync()
         {
-            _labels = await Http.GetFromJsonAsync<Label[]>("sample-data/labels.json");
+            _labels = await HttpClient.GetFromJsonAsync<Label[]>("sample-data/labels.json");
 
             FilterLabels(filter: string.Empty);
         }

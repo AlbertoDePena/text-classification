@@ -18,7 +18,7 @@ namespace TextClassification.Client
         private FiltersEnum _textSampleFilter;
 
         [Inject]
-        public HttpClient Http { get; set; }
+        public HttpClient HttpClient { get; set; }
 
         public TextSample CurrentTextSample
         {
@@ -29,8 +29,8 @@ namespace TextClassification.Client
                 return _textSampleFilter switch
                 {
                     FiltersEnum.ShowAll => _textSamples.Skip(_skipTextSamples).FirstOrDefault() ?? defaultValue,
-                    FiltersEnum.WithLabels => _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => ts.Labels.Length > 0) ?? defaultValue,
-                    FiltersEnum.WithoutLabels => _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => ts.Labels.Length == 0) ?? defaultValue,
+                    FiltersEnum.WithLabels => _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => ts.Labels.Count() > 0) ?? defaultValue,
+                    FiltersEnum.WithoutLabels => _textSamples.Skip(_skipTextSamples).FirstOrDefault(ts => ts.Labels.Count() == 0) ?? defaultValue,
                     _ => defaultValue,
                 };
             }
@@ -38,7 +38,7 @@ namespace TextClassification.Client
 
         protected override async Task OnInitializedAsync()
         {
-            _textSamples = await Http.GetFromJsonAsync<TextSample[]>("sample-data/text-samples.json");
+            _textSamples = await HttpClient.GetFromJsonAsync<TextSample[]>("sample-data/text-samples.json");
 
             _textSampleFilter = FiltersEnum.ShowAll;
         }
@@ -73,7 +73,7 @@ namespace TextClassification.Client
 
             newLabels.Add(label);
 
-            textSample.Labels = newLabels.ToArray();
+            textSample.Labels = newLabels;
         }
 
         public void RemoveLabel(Label label)
@@ -90,7 +90,7 @@ namespace TextClassification.Client
 
             newLabels.Remove(label);
 
-            textSample.Labels = newLabels.ToArray();
+            textSample.Labels = newLabels;
         }
     }
 }
