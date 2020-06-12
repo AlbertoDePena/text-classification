@@ -20,6 +20,8 @@ namespace TextClassification.Client
         [Inject]
         public HttpClient HttpClient { get; set; }
 
+        public IReadOnlyList<Label> Labels { get; private set; }
+
         public TextSample CurrentTextSample
         {
             get
@@ -38,7 +40,13 @@ namespace TextClassification.Client
 
         protected override async Task OnInitializedAsync()
         {
-            _textSamples = await HttpClient.GetFromJsonAsync<TextSample[]>("sample-data/text-samples.json");
+            _textSamples = 
+                await HttpClient.GetFromJsonAsync<TextSample[]>(
+                    "sample-data/text-samples.json");
+            
+            Labels = 
+                await HttpClient.GetFromJsonAsync<Label[]>(
+                    "sample-data/labels.json");
 
             _textSampleFilter = FiltersEnum.ShowAll;
         }

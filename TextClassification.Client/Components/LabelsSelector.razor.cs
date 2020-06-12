@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,33 +9,33 @@ namespace TextClassification.Client.Components
 {
     public class LabelsSelectorBase : ComponentBase
     {
-        private IReadOnlyList<Label> _labels;
-
-        [Inject]
-        public HttpClient HttpClient { get; set; }
-
         [Parameter]
         public EventCallback<Label> LabelSelected { get; set; }
 
-        public IReadOnlyList<Label> FilteredLabels;
+        [Parameter]
+        public IEnumerable<Label> Labels { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        public IEnumerable<Label> DataSource { get; private set; }
+
+        protected override async Task OnInitializedAsync() 
         {
-            _labels = await HttpClient.GetFromJsonAsync<Label[]>("sample-data/labels.json");
+            while (Labels == null)
+            {
+                await Task.Delay(millisecondsDelay: 1);
+            }
 
             FilterLabels(filter: string.Empty);
         }
 
-        public Task OnLabelSelectedAsync(Label label) => LabelSelected.InvokeAsync(label);
+        public Task OnLabelSelectedAsync(Label label) 
+            => LabelSelected.InvokeAsync(label);
 
-        public void OnFilterLabelChanged(ChangeEventArgs args) => FilterLabels(filter: args.Value as string);
-
-        private void FilterLabels(string filter)
+        public void FilterLabels(string filter)
         {
-            FilteredLabels =
+            DataSource =
                 string.IsNullOrWhiteSpace(filter) ?
-                _labels :
-                _labels.Where(l => l.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+                Labels?.ToList() :
+                Labels?.Where(l => l.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }

@@ -5,11 +5,11 @@
         Labels
     </div>
     <div class="content">
-        <input class="filter-label-input" placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
+        <input class="filter-label-input" placeholder="Filter labels..." @oninput="(e => FilterLabels(e.Value.ToString()))" />
         <div class="labels">
-            @if (FilteredLabels != null)
+            @if (DataSource != null)
             {
-                @foreach (var label in FilteredLabels)
+                @foreach (var label in DataSource)
                 {
                     <div class="label" @key=label.Id @onclick="(() => OnLabelSelectedAsync(label))">@label.Name</div>
                 }
