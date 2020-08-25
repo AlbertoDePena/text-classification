@@ -1,0 +1,6 @@
+obj
+bin
+.fable
+.ionide
+.fake
+node_modules
