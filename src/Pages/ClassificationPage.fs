@@ -23,5 +23,5 @@ let update (msg : Msg) (state : State) =
 let render (state: State) (dispatch: Msg -> unit) =
     match state.TextSamples with
     | HasNotStartedYet -> Html.none
-    | InProgress -> Html.h1 "Loaiding"
+    | InProgress -> Html.h1 "Loading"
     | Resolved textSamples -> Html.h1 "I Have data"
