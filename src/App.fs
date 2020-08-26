@@ -5,6 +5,7 @@ open Elmish
 open Feliz
 open Feliz.Router
 
+[<RequireQualifiedAccess>]
 type Page =
   | Classification
   | Labels
@@ -12,10 +13,10 @@ type Page =
   | NotFound
 
 type State =
-  { ClassificationState : ClassificationPage.State
-    LabelState : LabelPage.State
-    TextSampleState : TextSamplePage.State
-    NavbarState : Navbar.State
+  { Classification : ClassificationPage.State
+    Label : LabelPage.State
+    TextSample : TextSamplePage.State
+    Navbar : Navbar.State
     CurrentPage : Page }
 
 type Msg =
@@ -27,10 +28,10 @@ type Msg =
 
 let parseUrl segments =
   match segments with
-  | [] -> Classification
-  | [ "labels" ] -> Labels
-  | [ "text-samples" ] -> TextSamples
-  | _ -> NotFound
+  | [] -> Page.Classification
+  | [ "labels" ] -> Page.Labels
+  | [ "text-samples" ] -> Page.TextSamples
+  | _ -> Page.NotFound
 
 let init () =
   let classificationState, classificationCmd = ClassificationPage.init ()
@@ -41,10 +42,10 @@ let init () =
   let currentPage = Router.currentUrl() |> parseUrl
 
   let initialState = 
-    { ClassificationState = classificationState
-      LabelState = labelState
-      TextSampleState = textSampleState
-      NavbarState = navbarState
+    { Classification = classificationState
+      Label = labelState
+      TextSample = textSampleState
+      Navbar = navbarState
       CurrentPage = currentPage }
   
   let initialCmd = Cmd.batch [
@@ -62,33 +63,33 @@ let update (msg: Msg) (state: State) =
     { state with CurrentPage = page }, Cmd.none
 
   | NavbarMsg navbarMsg -> 
-    let navbarState, navbarCmd = Navbar.update navbarMsg state.NavbarState
-    { state with NavbarState = navbarState }, Cmd.map NavbarMsg navbarCmd
+    let navbarState, navbarCmd = Navbar.update navbarMsg state.Navbar
+    { state with Navbar = navbarState }, Cmd.map NavbarMsg navbarCmd
 
   | ClassificationMsg classificationMsg -> 
-    let classificationState, classificationCmd = ClassificationPage.update classificationMsg state.ClassificationState    
-    { state with ClassificationState = classificationState }, Cmd.map ClassificationMsg classificationCmd
+    let classificationState, classificationCmd = ClassificationPage.update classificationMsg state.Classification    
+    { state with Classification = classificationState }, Cmd.map ClassificationMsg classificationCmd
 
   | LabelMsg labelMsg ->
-    let labelState, labelCmd = LabelPage.update labelMsg state.LabelState    
-    { state with LabelState = labelState }, Cmd.map LabelMsg labelCmd
+    let labelState, labelCmd = LabelPage.update labelMsg state.Label    
+    { state with Label = labelState }, Cmd.map LabelMsg labelCmd
 
   | TextSampleMsg textSampleMsg ->
-    let textSampleState, textSampleCmd = TextSamplePage.update textSampleMsg state.TextSampleState    
-    { state with TextSampleState = textSampleState }, Cmd.map TextSampleMsg textSampleCmd
+    let textSampleState, textSampleCmd = TextSamplePage.update textSampleMsg state.TextSample    
+    { state with TextSample = textSampleState }, Cmd.map TextSampleMsg textSampleCmd
 
 let render (state: State) (dispatch: Msg -> unit) =
   let mainElement =
     match state.CurrentPage with
-    | Classification -> ClassificationPage.render state.ClassificationState (ClassificationMsg >> dispatch)
-    | Labels -> LabelPage.render state.LabelState (LabelMsg >> dispatch)
-    | TextSamples -> TextSamplePage.render state.TextSampleState (TextSampleMsg >> dispatch)
-    | NotFound -> Html.h1 "Not found"
+    | Page.Classification -> ClassificationPage.render state.Classification (ClassificationMsg >> dispatch)
+    | Page.Labels -> LabelPage.render state.Label (LabelMsg >> dispatch)
+    | Page.TextSamples -> TextSamplePage.render state.TextSample (TextSampleMsg >> dispatch)
+    | Page.NotFound -> Html.h1 "Not found"
 
   React.router [
     router.onUrlChanged (parseUrl >> PageChanged >> dispatch)
     router.children [
-      Navbar.render state.NavbarState (NavbarMsg >> dispatch)
+      Navbar.render state.Navbar (NavbarMsg >> dispatch)
       Html.main [
         prop.classes ["container"; "is-fluid"]
         prop.children [
