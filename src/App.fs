@@ -4,6 +4,7 @@ module App
 open Elmish
 open Feliz
 open Feliz.Router
+open Browser.Dom
 
 [<RequireQualifiedAccess>]
 type Page =
@@ -32,6 +33,13 @@ let parseUrl segments =
   | [ "labels" ] -> Page.Labels
   | [ "text-samples" ] -> Page.TextSamples
   | _ -> Page.NotFound
+
+let getDocumentTitle page =
+  match page with
+  | Page.Classification -> "Text Classification"
+  | Page.Labels -> "Text Classification - Labels"  
+  | Page.TextSamples -> "Text Classification - Text Samples"
+  | Page.NotFound -> "Text Classification - Page Not Found"  
 
 let init () =
   let classificationState, classificationCmd = ClassificationPage.init ()
@@ -79,6 +87,7 @@ let update (msg: Msg) (state: State) =
     { state with TextSample = textSampleState }, Cmd.map TextSampleMsg textSampleCmd
 
 let render (state: State) (dispatch: Msg -> unit) =
+  document.title <- getDocumentTitle state.CurrentPage
   let mainElement =
     match state.CurrentPage with
     | Page.Classification -> ClassificationPage.render state.Classification (ClassificationMsg >> dispatch)
@@ -91,7 +100,7 @@ let render (state: State) (dispatch: Msg -> unit) =
     router.children [
       Navbar.render state.Navbar (NavbarMsg >> dispatch)
       Html.main [
-        prop.classes ["container"; "is-fluid"]
+        prop.classes ["container"]
         prop.children [
           mainElement
         ]
